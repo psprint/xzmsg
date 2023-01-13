@@ -1,0 +1,81 @@
+#!/usr/bin/env zsh
+# Recognize and save info on run as `#!/usr/bin/env zsh` script
+[[ $0 != xzmsg || -n $ZSH_SCRIPT ]]&&integer script=1
+
+builtin emulate -L zsh
+builtin setopt extendedglob warncreateglobal typesetsilent \
+                noshortloops rcquotes noautopushd
+
+# Fix $0 with a new trick – use of a %x prompt expansion
+0=${(%):-%x}
+0=${${(M)0:#/*}:-$PWD/$0}
+
+# Unset helper function on exit
+builtin trap 'unset -f xzmsg_subst' EXIT
+
+# Mute possible create global warning
+local -a match mbegin mend reply
+local MATCH REPLY; integer MBEGIN MEND
+
+# -h - origin tag
+# -p - overwrite quiet mode
+# -q - quiet mode
+# -e - print to stderr
+# -n - no new line
+local -A Opts
+builtin zparseopts -D -E -A Opts -- h p q e n || return 7
+
+# Quiet mode? → no printing if so
+[[ ($+Opts[-q] == 1 || $1 == 1) && $+Opts[-p] != 1 ]]&&return
+
+# The color theme → customize via theme file or XZ global
+local -A XZ=("${(kv@)XZ}")
+if [[ -f $XZTHEME ]]; then
+    print 1
+    eval "XZ=(${(@z)"$(<$XZTHEME)"})" XZIO||\
+        print -u2 xzmsg:$LINENO Couldn\'t read theme file $XZTHEME \
+            \(error msg: $(<$XZLOG)\)
+else
+    print Q3
+    XZ=(% $'\e[0m' err %B%U204 url %U75)
+fi
+
+# Blue message origin tag?
+local funloc=$1 nick=$APPNICK q
+[[ $funloc == ?*:<-> ]]&&shift||funloc=
+[[ -n $funloc ]]&&q+="{tag}%B[%b$funloc%B]%b:%f"
+[[ -n $nick ]]&&q+="{nick}%U%B[%b$nick%B]%b"
+
+# Output origin tag?
+(($+Opts[-h]))&&builtin set -- $q "$@"
+# Output to stderr?
+(($+Opts[-e]))&&local err=-u2
+# No new line?
+(($+Opts[-n]))&&local n=-n
+
+# Main work function
+xzmsg_subst() {
+    setopt localoptions errreturn
+    local b=$1 be=$2 esc=$'\e[' qb='{' qbe='}'
+    local qc=%${${${(M)b#$qb}:+F}:-K} tmp
+    shift 2
+    reply=("${(@)@//(#b)((([\\][\\])#[^\\])|(#s))${b}([^$be]##)$be/\
+$match[2]${tmp::=}\
+${${${${(M)${${$(type -w xz-format-$match[4]):#*none}:+\
+${tmp::=$(xz-format-$match[4])}}:#(#m)<->##}:+$qc$qb$MATCH$qbe}:-$tmp}:-\
+${${${(M)XZ[$match[4]]:#($esc|(%[BbUuKk])##|)<->##(m|)}:+${XZ[$match[4]]//\
+(#m)<->##(#e)/$qc${qb}$MATCH${qbe}}}:-$qb$match[4]$qbe}}}" "%k%f%b%u")
+}
+
+# Substitute foreground {color}
+xzmsg_subst '{' '}' "$@"
+# Substitute background «color»
+xzmsg_subst '«' '»' "$reply[@]"
+
+# Substitute $HOME
+reply=("${reply[@]//$HOME/\~}")
+
+# Output
+builtin print $n $err -P -- "$reply[@]"
+
+# vim:ft=zsh:sw=4:sts=4:et
