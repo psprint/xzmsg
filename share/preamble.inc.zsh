@@ -17,7 +17,7 @@ builtin setopt extendedglob warncreateglobal typesetsilent \
        ${XZAES_DIR=::${0:h}/aliases}
 
 # Unset helper function on exit
-builtin trap 'unset -f xzmsg_subst' EXIT
+builtin trap 'unset -f xzmsg_subst xzmsg_cmd_helper' EXIT
 
 # Mute possible create global warning
 local -a match mbegin mend reply

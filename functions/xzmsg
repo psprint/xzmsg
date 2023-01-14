@@ -53,29 +53,41 @@ local funloc=$1 nick=$APPNICK tmp
 # No new line?
 (($+Opts[-n]))&&local n=-n
 
+xzmsg_cmd_helper() {
+    [[ $(builtin type -w xz-format-$1) != *:\ none ]]&&print found
+}
+
 # Main work function
 xzmsg_subst() {
-    setopt localoptions errreturn
     local pstart=$1 pend=$2 esc=$'\e[' cpstart='{' cpend='}'
-    local op='[' cop='{' qc=%${${${(M)pstart#$cpstart}:+F}:-K} tmp
+    local op='«' cop='{' qc=%${${${(M)pstart#$cpstart}:+F}:-K} tmp tmpf
     shift 2
-    reply=("${(@)@//(#b)(([\\][\\])#[^\\$op$cop]#)${pstart}([^$pend]##)$pend/\
-$match[1]${$(print -u2 match 1:$match[1] 2:$match[2] 3:$match[3,4])+}\
-${${${${$(type -w xz-format-$match[3]):#*none}:+\
-$(xz-format-$match[3])}}:-\
-${${${${(M)XZ[$match[3]]:#(#m)($esc|(%[kufbKUFB])##|)(<->##(m|)|)}:+\
-${MATCH%%[0-9]##}$qc${cpstart}${MATCH##[^0-9]##}${cpend}}}:-$pstart$match[3]$pend}}}")
-}
+    # Format functions
+    #${$(print -ru2 match 1:$match[1] 2:$match[2] 3:$match[2] 4:$match[3])+}\
+    REPLY="${(j: :)@//(#b)([\\]#)${pstart}([^$pend]##)$pend\
+([^$pstart]#~*[\\]##)/${${tmpf::=1}+}${${tmp::=$pstart$match[2]$pend}+}\
+$match[1]$match[1]${${match[1]//(#s)([\\][\\])#(#e)/\
+${$(xzmsg_cmd_helper $match[2]):+\
+$(xz-format-"$match[2]" "$match[3]")${match[3]::=}${tmpf::=}}}:-\
+$tmp}${tmpf:+$tmp}$match[3]}"
+    # XZ fields
+    REPLY="${REPLY//(#b)([\\]#)${pstart}([^$pend]##)$pend\
+([^$pstart]#~*[\\]##)/\
+${match[1]}${${${${(M)XZ[$match[2]]:#(#m)($esc|(%[kufbKUFB])##|)(<->##(m|)|)}:+\
+${MATCH%%[0-9]##}${${(M)MATCH%<->}:+$qc${cpstart}${MATCH##[^0-9]##}${cpend}}}}:-\
+$pstart$match[2]$pend}$match[3]}"
+ }
 
 # Substitute foreground {color}
 xzmsg_subst '{' '}' "$@"
 # Substitute background «color»
-xzmsg_subst '«' '»' "$reply[@]"
+xzmsg_subst '«' '»' "$REPLY"
 
 # Substitute $HOME
-reply=("${reply[@]//$HOME/\~}")
+REPLY="${REPLY//$HOME/~}"
 
 # Output
-builtin print $n $err -P -- "$reply[@]" "%k%f%b%u"
+#printf %s\\n
+builtin print -r $n $err -P -- "$REPLY" "%k%f%b%u"
 
 # vim:ft=zsh:sw=4:sts=4:et
