@@ -60,23 +60,33 @@ xzmsg_cmd_helper() {
 # Main work function
 xzmsg_subst() {
     local pstart=$1 pend=$2 esc=$'\e[' cpstart='{' cpend='}'
-    local op='«' cop='{' qc=%${${${(M)pstart#$cpstart}:+F}:-K} tmp tmpf
+    local op='«' cop='{' qc=%${${${(M)pstart#$cpstart}:+F}:-K} tmp tmpb tmpa
     shift 2
     # Format functions
     #${$(print -ru2 match 1:$match[1] 2:$match[2] 3:$match[2] 4:$match[3])+}\
     REPLY="${(j: :)@//(#b)([\\]#)${pstart}([^$pend]##)$pend\
-([^$pstart]#~*[\\]##)/${${tmpf::=1}+}${${tmp::=$pstart$match[2]$pend}+}\
-$match[1]$match[1]${${match[1]//(#s)([\\][\\])#(#e)/\
+([^$pstart]#~*[\\]##)/\
+${${tmp::=$pstart$match[2]$pend}+}\
+${${tmpb::=1}+}\
+${${tmpa::=${match[1]//(#m)(#s)([\\][\\])#(#e)/\
 ${$(xzmsg_cmd_helper $match[2]):+\
-$(xz-format-"$match[2]" "$match[3]")${match[3]::=}${tmpf::=}}}:-\
-$tmp}${tmpf:+$tmp}$match[3]}"
+$(xz-format-"$match[2]" "$match[3]")\
+${match[3]::=}${tmpb::=}${${match[1]::=${match[1]%[\\]}}+}}}}+}\
+$match[1]${tmpa/(#m)(#s)[\\]##(#e)/$tmp${tmpb::=}}\
+${tmpb:+$tmp}$match[3]}"
     # XZ fields
+    local e=kufbKUFB
     REPLY="${REPLY//(#b)([\\]#)${pstart}([^$pend]##)$pend\
 ([^$pstart]#~*[\\]##)/\
-${match[1]}${${${${(M)XZ[$match[2]]:#(#m)($esc|(%[kufbKUFB])##|)(<->##(m|)|)}:+\
-${MATCH%%[0-9]##}${${(M)MATCH%<->}:+$qc${cpstart}${MATCH##[^0-9]##}${cpend}}}}:-\
-$pstart$match[2]$pend}$match[3]}"
- }
+${match[1]%[\\]}\
+${${tmpb::=$pstart$match[2]$pend}+}\
+${${tmp::=${${${${(M)XZ[$match[2]]:#\
+(#m)($esc|(%[$e])##|)(<->##(m|)|)}:+\
+${MATCH%%[0-9]##}\
+${${(M)MATCH%<->}:+$qc${cpstart}${MATCH##[^0-9]##}${cpend}}}}}}+}\
+${${match[1]//(#s)([\\][\\])#(#e)/$tmp}//(#s)(#m)[\\]##(#e)/$tmpb}$match[3]}"
+    return 0
+}
 
 # Substitute foreground {color}
 xzmsg_subst '{' '}' "$@"
