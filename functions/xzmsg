@@ -56,15 +56,15 @@ local funloc=$1 nick=$APPNICK tmp
 # Main work function
 xzmsg_subst() {
     setopt localoptions errreturn
-    local b=$1 be=$2 esc=$'\e[' qb='{' qbe='}'
-    local qc=%${${${(M)b#$qb}:+F}:-K} tmp
+    local pstart=$1 pend=$2 esc=$'\e[' cpstart='{' cpend='}'
+    local op='[' cop='{' qc=%${${${(M)pstart#$cpstart}:+F}:-K} tmp
     shift 2
-    reply=("${(@)@//(#b)((([\\][\\])#[^\\])|(#s))${b}([^$be]##)$be/\
-$match[2]${tmp::=}\
-${${${${(M)${${$(type -w xz-format-$match[4]):#*none}:+\
-${tmp::=$(xz-format-$match[4])}}:#(#m)<->##}:+$qc$qb$MATCH$qbe}:-$tmp}:-\
-${${${(M)XZ[$match[4]]:#($esc|(%[BbUuKk])##|)<->##(m|)}:+${XZ[$match[4]]//\
-(#m)<->##(#e)/$qc${qb}$MATCH${qbe}}}:-$qb$match[4]$qbe}}}" "%k%f%b%u")
+    reply=("${(@)@//(#b)(([\\][\\])#[^\\$op$cop]#)${pstart}([^$pend]##)$pend/\
+$match[1]${$(print -u2 match 1:$match[1] 2:$match[2] 3:$match[3,4])+}\
+${${${${$(type -w xz-format-$match[3]):#*none}:+\
+$(xz-format-$match[3])}}:-\
+${${${${(M)XZ[$match[3]]:#(#m)($esc|(%[kufbKUFB])##|)(<->##(m|)|)}:+\
+${MATCH%%[0-9]##}$qc${cpstart}${MATCH##[^0-9]##}${cpend}}}:-$pstart$match[3]$pend}}}")
 }
 
 # Substitute foreground {color}
@@ -76,6 +76,6 @@ xzmsg_subst '«' '»' "$reply[@]"
 reply=("${reply[@]//$HOME/\~}")
 
 # Output
-builtin print $n $err -P -- "$reply[@]"
+builtin print $n $err -P -- "$reply[@]" "%k%f%b%u"
 
 # vim:ft=zsh:sw=4:sts=4:et

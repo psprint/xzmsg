@@ -1,4 +1,4 @@
-%       $'\e[0m'
+%       %k%u%f%b
 err     %B203
 warn    %B208
 file    %B41
