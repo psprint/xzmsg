@@ -9,10 +9,10 @@
 
 # Fix $0 with a new trick – use of a %x prompt expansion
 # Initial %/*~*xz… is for compatibility with Zinit plugin manager
-0="${${(%):-%x}%/*~*/xzmsg.plugin.zsh}"
-0="${${(M)0:#/*}:-$PWD/$0}"
+0="${${(%):-%x}%(functions/[a-z]*|xzmsg.plugin.zsh)}"
+0="${${(M)0:#/*}:-$PWD/$0}"functions/xmsg
 
-source "$0:h"/share/preamble.inc.zsh
+source "$0:h:h"/share/preamble.inc.zsh
 
 # -h - origin tag
 # -p - overwrite quiet mode
