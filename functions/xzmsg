@@ -43,8 +43,8 @@ fi
 # Blue message origin tag?
 local funloc=$1 nick=$APPNICK tmp
 [[ $funloc == ?*:<-> ]]&&shift||funloc=
-[[ -n $funloc ]]&&tmp+="{tag}%B[%b$funloc%B]%b:%f"
-[[ -n $nick ]]&&tmp+="{nick}%U%B[%b$nick%B]%b"
+[[ -n $funloc ]]&&tmp+="{tag}%B[%b$funloc%B]%b:{%}"
+[[ -n $nick ]]&&tmp+="{nick}%U%B[%b$nick%B]{%}"
 
 # Output origin tag?
 (($+Opts[-h]))&&builtin set -- $tmp "$@"
