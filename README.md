@@ -22,3 +22,7 @@ You can export following variables:
 ## Screenshots
 
 ![screenshot](https://github.com/psprint/xzmsg/blob/master/img/screenshot.png)
+
+Blue theme:
+
+![screenshotblue](https://github.com/psprint/xzmsg/blob/master/img/screenshotblue.png)

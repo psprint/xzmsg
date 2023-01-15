@@ -32,8 +32,9 @@ builtin zparseopts -D -E -A Opts -- h p q e n || return 7
 )&&\
     (($?==3))&&local -A XZ=("${(kv@)XZ}")||local -A XZ
 
-if [[ -f $XZTHEME || -f ${XZTHEME::=$XZDIR/themes/default.xzt} ]]; then
-    eval "XZ=(${(@z)"$(<$XZTHEME)"})" XZIO||\
+if [[ -f $XZDIR/themes/$XZTHEME(.xzt|)(#q) || -f ${XZTHEME::=$XZDIR/themes/default.xzt} ]]; then
+    local -a q=($XZDIR/themes/$XZTHEME(.xzt|)(N) $XZTHEME(N))
+    eval "XZ=(${(@z)"$(<$q[1])"})" XZIO||\
         builtin print -u2 xzmsg:$LINENO Couldn\'t read theme file $XZTHEME \
             \(error msg: $(<$XZLOG)\)
 else
