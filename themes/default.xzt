@@ -1,4 +1,4 @@
-%       %k%u%f%b
+%       %u%k%f%b
 tag     135
 nick    27
 err     %B203
@@ -21,7 +21,7 @@ bar     %B%U27
 pre     %B135
 fail    %B203
 succ    %B39
-nl      \\n
+nl      $'\n'
 ice     41
 nb      %b
 …       "${${${(M)LANG:#*UTF-8*}:+…}:-...}"

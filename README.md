@@ -6,3 +6,7 @@ will work,
 - a standard file location header `[xzmsg:10][XZ]: …message` on `xzmsg -h …`,
 - themes – customize the color palette used.
 
+`xzmsg` can be used as function on Zsh (via `autoload` builtin) or as a script
+or also on Bash as script (via `#!/usr/bin/env zsh`).
+
+
