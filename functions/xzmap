@@ -4,14 +4,13 @@
 # Copyright (c) 2023 Sebastian Gniazdowski
 #
 
-[[ $0 != xzmap || -n $ZSH_SCRIPT ]]&&integer is_script=1
-0="${${(%):-%x}%/*~*/xzmsg.plugin.zsh}"
-0="${${(M)0:#/*}:-$PWD/$0}"
-: ${XZDIR:=$0:h} %{XZBIN_DIR::=${0:h}/bin} \
-       XZFUNC_DIR="${0:h}"/functions \
-       XZAES_DIR="${0:h}"/aliases
+[[ $0 != xzmap || -n $ZSH_SCRIPT ]]&&integer bescript=1
+0="${${(%):-%x}%(functions/[a-z]*|xzmsg.plugin.zsh)}"
+0="${${(M)0:#/*}:-$PWD/$0}"functions/xmsg
 
-source $XZDIR/share/preamble.inc.zsh
+source "$0:h:h/share/preamble.inc.zsh"
+
+: ${XZLOG:=$(mktemp)}
 
 # Input/options
 local -A Opts
@@ -20,29 +19,29 @@ builtin zparseopts -D -E -A Opts -- || return 1
 local f=$1
 shift
 
-builtin type tigmsg &>$XZLOG||alias tigmsg=xzmsg
+builtin type xzmsg &>$XZLOG||alias xzmsg=xzmsg
  
 [[ -z $f ]]&&{
-    tigmsg -h {208}Error:{137} Missing first arg: runnable name/path
+    xzmsg -h {208}Error:{137} Missing first arg: runnable name/path
     return 1
 }
 
 if ! type $f &>$XZLOG; then
-    tigmsg -h {208}Error:{137} Couldn\'t find runnable: {33}$f
+    xzmsg -h {208}Error:{137} Couldn\'t find runnable: {33}$f
     return 3
 fi
 
 (($# <= 0))&&{
-    tigmsg -h {208}Error:{137} Missing arguments: the objects to run ·{33}$f\
+    xzmsg -h {208}Error:{137} Missing arguments: the objects to run ·{33}$f\
         {137}· on
     return 1
 }
 
-reply=()
+REPLY= reply=()
 local qe ec
 
 for qe; do
-    repeat 1 {$f $qe&&{ec+=0;reply+=("$REPLY")}||{ec+=$(($?%10));reply+=("");};}
+    repeat 1 {$f $qe&&{ec+=0;reply+=("$REPLY");}||{ec+=$(($?%10));reply+=("");};}
 done
 REPLY=$ec
 
@@ -50,7 +49,7 @@ REPLY=$ec
 [[ REPLY != <1-9># ]]&&integer have_output=1
 
 # If run as script, then output via stdout
-if ((have_output&&is_script));then
+if ((have_output&&bescript));then
     print -r -- $REPLY
     printf %s\\n "${reply[@]}"
 fi

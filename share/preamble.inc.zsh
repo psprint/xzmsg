@@ -14,14 +14,15 @@ builtin setopt extendedglob warncreateglobal typesetsilent \
 
 : ${XZDIR:=$0:h} ${XZBIN_DIR::=${0:h}/bin} \
        ${XZFUNC_DIR=::${0:h}/functions} \
-       ${XZAES_DIR=::${0:h}/aliases}
+       ${XZAES_DIR=::${0:h}/aliases} \
+       ${XZLOG:=$(mktemp)}
 
 # Unset helper function on exit
-builtin trap 'unset -f xzmsg_subst xzmsg_cmd_helper' EXIT
+builtin trap 'unset -f xzmsg_subst xzmsg_cmd_helper &>$XZLOG' EXIT
 
 # Mute possible create global warning
-local -a match mbegin mend reply
-local MATCH REPLY; integer MBEGIN MEND
+typeset -ag match mbegin mend reply
+typeset -g MATCH REPLY; integer -g MBEGIN MEND
 
 # Set up aliases (global, suffix and the proper ones)
 for REPLY in $XZAES_DIR/*[a-zA-Z];do
