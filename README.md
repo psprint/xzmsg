@@ -9,4 +9,6 @@ will work,
 `xzmsg` can be used as function on Zsh (via `autoload` builtin) or as a script
 or also on Bash as script (via `#!/usr/bin/env zsh`).
 
+## Screenshots
 
+![screenshot](https://github.com/psprint/xzmsg/blob/master/img/screenshot.png)
