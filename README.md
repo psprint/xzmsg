@@ -9,6 +9,14 @@ will work,
 `xzmsg` can be used as function on Zsh (via `autoload` builtin) or or also
 on Bash as script (via `#!/usr/bin/env zsh`).
 
+You can export following variables:
+- `APPNICK`, for standard message preamble tag: [app][file:line], default `XZ`,
+- `XZCONF`, default `${XDG_CONFIG_HOME:-$HOME/.config}/xzmsg`,
+- `XZCACHE`, default `${XDG_CACHE_HOME:-$HOME/.cache}/xzmsg`,
+- `XZINI`, default `$XZCACHE/${(L)APPZNICK}.xzc}`,
+- `XZLOG`, default `$XZCACHE/${(L)APPZNICK}.xzl}`,
+- `XZTHEME`, default `$XZDIR/themes/default.xzt}`.
+
 ## Screenshots
 
 ![screenshot](https://github.com/psprint/xzmsg/blob/master/img/screenshot.png)
