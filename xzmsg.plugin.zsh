@@ -43,6 +43,6 @@ for REPLY in $XZAES_DIR/*[a-zA-Z];do
 done
 
 # Load any case (#i) and both files and symlinks (@ and .)
-autoload -z "$XZFUNC_DIR"/*[0-9A-Za-z](N:t.,@)
+builtin autoload -z "$XZFUNC_DIR"/*[0-9A-Za-z](N.,@)
 
 # vim:ft=zsh:tw=80:sw=4:sts=4:et:foldmarker=[[[,]]]

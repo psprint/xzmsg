@@ -4,9 +4,9 @@
 # Copyright (c) 2023 Sebastian Gniazdowski
 #
 
+# Recognize and save info on run as `#!/usr/bin/env zsh` script
 [[ $0 != xzmap || -n $ZSH_SCRIPT ]]&&integer bescript=1
-0="${${(%):-%x}%(functions/[a-z]*|xzmsg.plugin.zsh)}"
-0="${${(M)0:#/*}:-$PWD/$0}"functions/xmsg
+0="${${(M)${0::=${(%):-%x}}:#/*}:-$PWD/$0}"
 
 source "$0:h:h/share/preamble.inc.zsh"
 

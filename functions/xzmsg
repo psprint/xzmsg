@@ -6,13 +6,9 @@
 
 # Recognize and save info on run as `#!/usr/bin/env zsh` script
 [[ $0 != xzmsg || -n $ZSH_SCRIPT ]]&&integer bescript=1
+0="${${(M)${0::=${(%):-%x}}:#/*}:-$PWD/$0}"
 
-# Fix $0 with a new trick – use of a %x prompt expansion
-# Initial %/*~*xz… is for compatibility with Zinit plugin manager
-0="${${(%):-%x}%(functions/[a-z]*|xzmsg.plugin.zsh)}"
-0="${${(M)0:#/*}:-$PWD/$0}"functions/xmsg
-
-source "$0:h:h"/share/preamble.inc.zsh
+source "$0:h:h/share/preamble.inc.zsh"
 
 # -h - origin tag
 # -p - overwrite quiet mode
@@ -32,7 +28,7 @@ builtin zparseopts -D -E -A Opts -- h p q e n || return 7
 )&&\
     (($?==3))&&local -A XZ=("${(kv@)XZ}")||local -A XZ
 
-if [[ -f $XZDIR/themes/$XZTHEME(.xzt|)(#q) || -f ${XZTHEME::=$XZDIR/themes/default.xzt} ]]; then
+if [[ -f $XZDIR/themes/$XZTHEME:t:r.xzt(#qN) || -f ${XZTHEME::=$XZDIR/themes/default.xzt} ]]; then
     local -a q=($XZDIR/themes/$XZTHEME(.xzt|)(N) $XZTHEME(N))
     eval "XZ=(${(@z)"$(<$q[1])"})" XZIO||\
         builtin print -u2 xzmsg:$LINENO Couldn\'t read theme file $XZTHEME \
