@@ -5,7 +5,7 @@
 #
 
 builtin emulate -L zsh
-builtin setopt extendedglob warncreateglobal typesetsilent \
+builtin setopt extendedglob kshglob warncreateglobal typesetsilent \
                 noshortloops rcquotes noautopushd
 
 # Possibly fix $0 with a new trick – use of a %x prompt expansion
@@ -30,5 +30,13 @@ typeset -g MATCH REPLY; integer -g MBEGIN MEND
     alias "${${REPLY#*=}%%:*}" "${(M)REPLY##[^=]##}=${REPLY#*:}"
 done
 
+xzclean() {
+    # Cleanup
+    REPLY= MATCH= MBEGIN= MEND= reply=() match=() mbegin=() mend=()
+}
+
+xzclean
+
 # Load any case both files and symlinks (@ and .)
 builtin autoload -z regex-replace "$XZFUNCS"/*[^~](N.,@)
+ 
