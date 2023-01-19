@@ -6,8 +6,11 @@
 
 # Recognize and save info on run as `#!/usr/bin/env zsh` script
 [[ $0 != xzmsg || -n $ZSH_SCRIPT ]]&&integer bescript=1
+
+# Set $0 with a new trik - use of %x prompt expansion
 0="${${(M)${0::=${(%):-%x}}:#/*}:-$PWD/$0}"
 
+# Source init script
 source "$0:h:h/share/preamble.inc.zsh"
 
 # -h - origin tag
@@ -20,6 +23,7 @@ builtin zparseopts -D -E -A Opts -- h p q e n || return 7
 
 # Quiet mode? → no printing if so
 [[ ($+Opts[-q] == 1 || $1 == 1) && $+Opts[-p] != 1 ]]&&return
+[[ $1 == 0 ]]&&shift
 
 # The color theme → customize via theme file or XZ global, first testing it
 (
@@ -96,5 +100,8 @@ REPLY="${REPLY//$HOME/~}"
 # Output
 #printf %s\\n
 builtin print -r $n $err -P -- "$REPLY" "%k%f%b%u"
+
+# Mark that xzmsg has run, to use in [[…]]&&xzmsg … cascades
+REPLY=1
 
 # vim:ft=zsh:sw=4:sts=4:et

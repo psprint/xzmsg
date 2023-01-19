@@ -9,12 +9,12 @@ builtin setopt extendedglob warncreateglobal typesetsilent \
                 noshortloops rcquotes noautopushd
 
 # Possibly fix $0 with a new trick – use of a %x prompt expansion
-0=${${(%):-%x}%/*~*/xzmsg.plugin.zsh}
-0=${${(M)0:#/*}:-$PWD/$0}
+0="${${(M)${0::=${(%):-%x}}:#/*}:-$PWD/$0}"
 
-: ${XZDIR:=$0:h} ${XZBIN_DIR::=${0:h}/bin} \
-       ${XZFUNC_DIR=::${0:h}/functions} \
-       ${XZAES_DIR=::${0:h}/aliases} \
+# Restore the variables if needed (i.e. not exported)
+: ${XZDIR:=$0:h:h} ${XZBIN_DIR::=$0:h:h/bin} \
+       ${XZFUNCS=::$0:h:h/functions} \
+       ${XZAES=::$0:h:h/aliases} \
        ${XZLOG:=$(mktemp)}
 
 # Unset helper function on exit
@@ -25,7 +25,10 @@ typeset -ag match mbegin mend reply
 typeset -g MATCH REPLY; integer -g MBEGIN MEND
 
 # Set up aliases (global, suffix and the proper ones)
-for REPLY in $XZAES_DIR/*[a-zA-Z];do
+[[ -f $XZAES/*[^~](#qNY1.,@) ]]&&for REPLY in $XZAES/*[^~](.,@);do
     REPLY="$REPLY:t=$(<$REPLY)"
     alias "${${REPLY#*=}%%:*}" "${(M)REPLY##[^=]##}=${REPLY#*:}"
 done
+
+# Load any case both files and symlinks (@ and .)
+builtin autoload -z regex-replace "$XZFUNCS"/*[^~](N.,@)
