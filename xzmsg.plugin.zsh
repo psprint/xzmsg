@@ -30,7 +30,7 @@ export XZDIR="$0:h" \
 : ${XZTHEME:=$XZDIR/themes/default.xzt}
 
 command mkdir -p $XZCONF $XZCACHE
-export APPNICK XZCONF XZCACHE XZLOG XZTHEME
+export APPNICK XZCONF XZCACHE XZLOG XZTHEME XZINI
 
 # Safe variables
 typeset -g REPLY reply=()
