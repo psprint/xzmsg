@@ -11,6 +11,7 @@ builtin setopt extendedglob kshglob warncreateglobal typesetsilent \
 # Possibly fix $0 with a new trick – use of a %x prompt expansion
 0="${${(M)${0::=${(%):-%x}}:#/*}:-$PWD/$0}"
 
+export XZDIR XZBIN_DIR XZFUNCS XZAES XZLOG
 # Restore the variables if needed (i.e. not exported)
 : ${XZDIR:=$0:h:h} ${XZBIN_DIR::=$0:h:h/bin} \
        ${XZFUNCS=::$0:h:h/functions} \
